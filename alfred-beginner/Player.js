@@ -23,9 +23,19 @@ class Player {
     	warrior.walk();
     } 
 
-    else {
+    else if(warrior.feel().getUnit().isBound()){
+    	warrior.think('this captive needs to be rescued.');
+    	warrior.rescue()
+    }
+
+    else if(warrior.feel().getUnit().isEnemy()){
     	warrior.think('his steel is sharp.');
-    	warrior.attack();
+    	warrior.attack();    	
+    }
+
+    else {
+    	warrior.think('he is totally lost and panic may set in.');
+
     }
     this._prevHealth = warrior.health();
   }
