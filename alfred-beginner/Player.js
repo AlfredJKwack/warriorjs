@@ -3,17 +3,51 @@ class Player {
 
   	if(!this._init){
   		warrior.think('tying his shoelaces is necessary.');
-  		this._prevHealth = warrior.health();
-  		this._maxHealth  = warrior.health();
-  		this._init       = true;
+  		this._underAttack   = false;
+  		this._prevHealth    = warrior.health();
+  		this._critHealth    = false;
+  		this._maxHealth     = warrior.health();
+  		this._startFromWall = !warrior.feel('backward').isEmpty()
+  		this._init          = true;
   	}
 
-  	if(warrior.health() < this._prevHealth && warrior.feel().isEmpty()){
-  		warrior.think('he cannot rest here and should press on.');
-  		warrior.walk();
+  	if(warrior.health() < this._prevHealth){
+  		warrior.think('he is under attack.');
+  		this._underAttack = true;
+  	} else {
+  		warrior.think('he is not under attack.');
+  		this._underAttack = false;
   	}
 
-  	else if(warrior.health() < this._maxHealth && warrior.feel().isEmpty()){
+  	if(warrior.health() < Math.round(this._maxHealth/3)+1){
+  		warrior.think('his health is critical.');
+  		this._critHealth = true;
+  	} else {
+  		warrior.think('his health good enough to do battle.');
+  		this._critHealth = false;
+  	}
+
+
+
+  	if(!this._startFromWall){
+  		warrior.think('something is behind me.');
+
+  		if(warrior.feel('backward').isEmpty()){
+  			warrior.walk('backward');
+  		}
+  		else if(warrior.feel('backward').getUnit().isBound()) {
+  			warrior.rescue('backward');
+  			this._startFromWall = true;
+  		}
+  		return;
+  	}
+
+  	if(this._critHealth && this._underAttack){
+  		warrior.think('he should retreat to a safer position.');
+  		warrior.walk('backward');
+  	}
+
+  	else if(!this._underAttack && warrior.health() < this._maxHealth){
   		warrior.think('it is safe to take a knee.');
   		warrior.rest();
   	}
