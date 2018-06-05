@@ -7,7 +7,7 @@ class Player {
   		this._prevHealth    = warrior.health();
   		this._critHealth    = false;
   		this._maxHealth     = warrior.health();
-  		this._startFromWall = !warrior.feel('backward').isEmpty()
+  		this._startFromWall = !warrior.feel('backward').isEmpty() || warrior.feel().isWall();
   		this._init          = true;
   	}
 
@@ -29,20 +29,12 @@ class Player {
 
 
 
-  	if(!this._startFromWall){
-  		warrior.think('something is behind me.');
-
-  		if(warrior.feel('backward').isEmpty()){
-  			warrior.walk('backward');
-  		}
-  		else if(warrior.feel('backward').getUnit().isBound()) {
-  			warrior.rescue('backward');
-  			this._startFromWall = true;
-  		}
-  		return;
+  	if(!this._startFromWall || warrior.feel().isWall()){
+  		warrior.think('he should turn around.');
+  		warrior.pivot();
   	}
 
-  	if(this._critHealth && this._underAttack){
+  	else if(this._critHealth && this._underAttack){
   		warrior.think('he should retreat to a safer position.');
   		warrior.walk('backward');
   	}
